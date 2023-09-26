@@ -1,0 +1,17 @@
+services:
+  caddy:
+    container_name: caddy
+    image: caddy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - './config/Caddyfile:/etc/caddy/Caddyfile'
+      - './data:/data'
+      - './config:/config'
+
+networks:
+  default:
+    name: ${REVERSE_PROXY_NETWORK}
+    external: true

@@ -1,0 +1,15 @@
+services:
+  homarr:
+    container_name: homarr
+    image: ghcr.io/ajnart/homarr:latest
+    restart: unless-stopped
+    volumes:
+      - './config:/app/data/configs'
+      - './data/icons:/app/public/icons'
+    ports:
+      - '7575:7575'
+
+networks:
+  default:
+    name: ${REVERSE_PROXY_NETWORK}
+    external: true

@@ -1,0 +1,16 @@
+http://{$HOME_DOMAIN} {
+    reverse_proxy homarr:7575
+}
+
+http://pihole.{$HOME_DOMAIN}{
+    reverse_proxy pihole:80
+    encode zstd gzip
+}
+
+http://homeassistant.{$HOME_DOMAIN} {
+    reverse_proxy homeassistant:8123
+}
+
+http://plex.{$HOME_DOMAIN} {
+    reverse_proxy plex:32400
+}
