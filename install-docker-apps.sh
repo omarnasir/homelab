@@ -1,4 +1,5 @@
 #! /bin/bash
+APPS=( "homeassistant" "pihole" "plex" )
 
 # Set environment variables from .env file
 export $(grep -v '^#' .env | xargs)
@@ -14,7 +15,6 @@ echo "$HOST_IP $HOME_DOMAIN"  > ./pihole/config/etc-pihole/custom.list
 # to be accessible via hostname on your local network.
 > ./pihole/config/etc-dnsmasq.d/05-pihole-custom-cname.conf
 
-APPS=( "homeassistant" "pihole" "plex" )
 for app in "${APPS[@]}"
 do
      echo "cname=$app.$HOME_DOMAIN,$HOME_DOMAIN" >> \

@@ -8,6 +8,9 @@ services:
     restart: unless-stopped
     ports:
       - '8123:8123'
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
 
 networks:
   default:

@@ -10,6 +10,9 @@ services:
       - './config/Caddyfile:/etc/caddy/Caddyfile'
       - './data:/data'
       - './config:/config'
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
 
 networks:
   default:

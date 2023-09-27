@@ -27,6 +27,8 @@ services:
       PLEX_CLAIM: '${PLEX_CLAIM}'
       ADVERTISE_IP: 'http://${HOST_IP}:32400/'
       ALLOWED_NETWORKS: '${PLEX_ALLOWED_NETWORKS}'
+      PUID: ${PUID}
+      PGID: ${PGID}
 
 networks:
   default:
