@@ -1,6 +1,0 @@
-include:
-  - ./caddy/docker-compose.yml
-  - ./pihole/docker-compose.yml
-  - ./homeassistant/docker-compose.yml
-  - ./plex/docker-compose.yml
-  - ./homarr/docker-compose.yml

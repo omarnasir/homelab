@@ -1,5 +1,6 @@
 #! /bin/bash
-APPS=( "homeassistant" "pihole" "plex" )
+APPS_TO_COMPOSE=( "caddy" "pihole" "homeassistant" "plex" )
+APPS_FOR_CNAME_RESOLUTION=( "homeassistant" "pihole" "plex" )
 
 # Set environment variables from .env file
 export $(grep -v '^#' .env | xargs)
@@ -15,7 +16,7 @@ echo "$HOST_IP $HOME_DOMAIN"  > ./pihole/config/etc-pihole/custom.list
 # to be accessible via hostname on your local network.
 > ./pihole/config/etc-dnsmasq.d/05-pihole-custom-cname.conf
 
-for app in "${APPS[@]}"
+for app in "${APPS_FOR_CNAME_RESOLUTION[@]}"
 do
      echo "cname=$app.$HOME_DOMAIN,$HOME_DOMAIN" >> \
      ./pihole/config/etc-dnsmasq.d/05-pihole-custom-cname.conf
@@ -23,7 +24,10 @@ done
 # ----------------- #
 
 # Run docker-compose
-docker-compose up -d
+for app in "${APPS_TO_COMPOSE[@]}"
+do
+     docker compose -f "$app/docker-compose.yml" up -d
+done
 
 # unset environment vars from an .env file
 unset $(grep -v '^#' .env | awk 'BEGIN { FS = "=" } ; { print $1 }')

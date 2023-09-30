@@ -1,8 +1,4 @@
-http://{$HOME_DOMAIN} {
-    reverse_proxy homarr:7575
-}
-
-http://pihole.{$HOME_DOMAIN}{
+http://pihole.{$HOME_DOMAIN} {
     reverse_proxy pihole:80
     encode zstd gzip
 }
