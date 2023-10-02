@@ -17,9 +17,6 @@ services:
       VIRTUAL_HOST: 'pihole.${HOME_DOMAIN}'
       PUID: ${PUID}
       PGID: ${PGID}
-    extra_hosts:
-      - '${HOME_DOMAIN}:${HOST_IP}'
-      - 'pihole pihole.${HOME_DOMAIN}:${HOST_IP}'
     dns:
       - "1.1.1.1"
       - "1.0.0.1"
