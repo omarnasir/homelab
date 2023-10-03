@@ -1,27 +1,31 @@
 # 1. Pre-requisites
-Before install docker apps, the following environment variables must be set in the root .env file as well as the .env file in the required app directory. If an app is not mentioned below, it does not require any environment variables to be set, or it will use the default values set in the root .env file.
+Before install docker apps, the following environment variables must be set in the root .env file as well as the .env file in the required app directory. This is for security reasons, if the sensitive variables are set in the root directory, during docker compose session all containers will have access to these, meaning if a container is compromised it can leak these variables. 
+
+If an app is not mentioned below, it does not require any environment variables to be set, or it will use the default values set in the root .env file.
 
 ## 1.1. Required .env variables
+These are general examples, and should be modified freely.
 ```ini
 -> ./.env
 # General
-TZ=
-PUID=
-PGID=
+TZ=Europe/London
+PUID=1000
+PGID=1000
 # CADDY
-REVERSE_PROXY_NETWORK=
-HOME_DOMAIN=
-HOST_IP=
-HOST_GATEWAY=
-HOST_SUBNET=
+REVERSE_PROXY_NETWORK=caddy_network
+HOME_DOMAIN=homelab.home
+HOST_IP=192.168.1.2
+HOST_GATEWAY=192.168.1.1
+HOST_SUBNET=192.168.1.0/24
 
 -> ./pihole/.env
 # Pi-hole
-PIHOLE_WEBPASSWORD=
+PIHOLE_WEBPASSWORD="mypassword"
 
 -> ./plex/.env
 # Plex
-PLEX_CLAIM=
+PLEX_CLAIM="claim_plex"
+PLEX_ALLOWED_NETWORKS="192.168.1.0/24"
 ```
 
 ## 1.2. Sanity Check

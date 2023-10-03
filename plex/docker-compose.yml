@@ -17,19 +17,17 @@ services:
       # - "33400:33400" # If you use Plex Web Tools
     # devices:
     #   - /dev/dri:/dev/dri # for hardware transcoding
-    env_file:
-      - .env
     volumes:
       - './config:/config'
       - './data/tv:/tv'
       - './data/movies:/movies'
       - '/dev/shm:/transcode'
     environment:
-      PLEX_CLAIM: ${PLEX_CLAIM}
-      ADVERTISE_IP: 'http://${HOST_IP}:32400/'
-      ALLOWED_NETWORKS: '${PLEX_ALLOWED_NETWORKS}'
-      PUID: ${PUID}
-      PGID: ${PGID}
+      - 'PLEX_CLAIM=${PLEX_CLAIM}'
+      - 'ADVERTISE_IP=http://${HOST_IP}:32400/,http://plex.${HOME_DOMAIN}'
+      - 'ALLOWED_NETWORKS=${PLEX_ALLOWED_NETWORKS}'
+      - PUID=${PUID}
+      - PGID=${PGID}
 
 networks:
   default:
