@@ -11,6 +11,7 @@ services:
       - './data:/data'
       - './config:/config'
     environment:
+      HOME_DOMAIN: '${HOME_DOMAIN}'
       PUID: ${PUID}
       PGID: ${PGID}
 
