@@ -1,12 +1,13 @@
-`http://pihole."{$HOME_DOMAIN}"` {
+http://pihole.{$HOME_DOMAIN} {
     reverse_proxy pihole:80
     encode zstd gzip
 }
 
-`http://homeassistant."{$HOME_DOMAIN}"` {
+http://homeassistant.{$HOME_DOMAIN} {
     reverse_proxy homeassistant:8123
 }
 
-`http://plex."{$HOME_DOMAIN}"` {
-    reverse_proxy plex:32400
+http://plex.{$HOME_DOMAIN} {
+    encode gzip zstd
+    reverse_proxy 192.168.0.200:32400 
 }
