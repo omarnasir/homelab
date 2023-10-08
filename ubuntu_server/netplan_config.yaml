@@ -1,0 +1,19 @@
+# editing /etc/netplan/01-netcfg.yaml *
+network:
+  ethernets:
+    eth0:
+      link-local: [ ipv4 ]
+      addresses:
+        - 192.168.1.2/24
+      routes:
+        - to: default
+          via: 192.168.1.1
+      nameservers:
+        # add the local router as a secondary dns server to ensure internet access on the 
+        # host machine, if pihole goes offline (updates, etc)
+        addresses: [127.0.0.1, 192.168.1.1]
+    wlan:
+       optional: true
+       dhcp4: no
+       activation-mode: off
+  version: 2
