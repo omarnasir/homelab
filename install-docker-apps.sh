@@ -1,6 +1,6 @@
 #! /bin/bash
-APPS_TO_COMPOSE=( "caddy" "pihole" "homeassistant" "plex" )
-APPS_FOR_CNAME_RESOLUTION=( "homeassistant" "pihole" "plex" )
+APPS_TO_COMPOSE=( "caddy" "pihole" "homeassistant" "plex" "portainer" )
+APPS_FOR_CNAME_RESOLUTION=( "homeassistant" "pihole" "plex" "portainer" )
 
 # Set environment variables from .env file
 export $(grep -v '^#' .env | xargs)
