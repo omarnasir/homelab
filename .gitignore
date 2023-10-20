@@ -5,5 +5,5 @@
 .env
 
 # Large config directories
-homeassistant/config/
+ha_stack/config/
 pihole/config/

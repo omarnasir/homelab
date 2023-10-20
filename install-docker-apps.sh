@@ -1,12 +1,13 @@
 #! /bin/bash
-APPS_TO_COMPOSE=( "caddy" "pihole" "homeassistant" "plex" "portainer" )
-APPS_FOR_CNAME_RESOLUTION=( "homeassistant" "pihole" "plex" "portainer" )
+APPS_FOR_CNAME_RESOLUTION=( "homeassistant" "pihole" "plex" "portainer" "influxdb" "grafana" )
+STACKS_TO_COMPOSE=( "caddy" "ha_stack" "pihole" "plex" "portainer" )
 
 # Set environment variables from .env file
 export $(grep -v '^#' .env | xargs)
 
 # Create docker network
-docker network create "$REVERSE_PROXY_NETWORK" --driver=bridge
+docker network create "$REVERSE_PROXY_NETWORK" --driver=bridge --subnet=172.19.0.0/24 \
+     --gateway=172.19.0.1
 
 # ----------------- #
 # PiHole DNS Config #
@@ -24,7 +25,7 @@ done
 # ----------------- #
 
 # Run docker-compose
-for app in "${APPS_TO_COMPOSE[@]}"
+for app in "${STACKS_TO_COMPOSE[@]}"
 do
      docker compose -f "$app/docker-compose.yml" up -d
 done

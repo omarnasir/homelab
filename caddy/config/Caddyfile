@@ -15,3 +15,7 @@ http://plex.{$HOME_DOMAIN} {
 http://portainer.{$HOME_DOMAIN} {
     reverse_proxy portainer:9000
 }
+
+http://influxdb.{$HOME_DOMAIN} {
+    reverse_proxy influxdb:8086
+}

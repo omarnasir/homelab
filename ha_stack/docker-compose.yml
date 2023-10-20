@@ -1,0 +1,58 @@
+services:
+  homeassistant:
+    container_name: homeassistant
+    image: "ghcr.io/home-assistant/home-assistant:stable"
+    volumes:
+      - './config/homeassistant/:/config'
+      - '/etc/localtime:/etc/localtime:ro'
+    restart: unless-stopped
+    depends_on:
+      - mariadb
+      - influxdb
+    devices:
+      - /dev/serial/by-id/usb-Silicon_Labs_Sonoff_Zigbee_3.0_USB_Dongle_Plus_0001-if00-port0:/dev/sonoff
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+  mariadb:
+    image: mariadb
+    container_name: mariadb
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      PUID: ${PUID}
+      PGID: ${PGID}
+    networks:
+      default:
+        ipv4_address: 172.19.0.250
+    volumes:
+      - './data/mariadb/:/var/lib/mysql'
+      - '${MYSQL_SOCKET}:/var/run/mysqld'
+    restart: always
+  influxdb:
+    image: influxdb:latest
+    container_name: influxdb
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    networks:
+      default:
+        ipv4_address: 172.19.0.251
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: ${DOCKER_INFLUXDB_INIT_MODE}
+      DOCKER_INFLUXDB_INIT_USERNAME: ${DOCKER_INFLUXDB_INIT_USERNAME}
+      DOCKER_INFLUXDB_INIT_PASSWORD: ${DOCKER_INFLUXDB_INIT_PASSWORD}
+      DOCKER_INFLUXDB_INIT_ORG: ${DOCKER_INFLUXDB_INIT_ORG}
+      DOCKER_INFLUXDB_INIT_BUCKET: ${DOCKER_INFLUXDB_INIT_BUCKET}
+      DOCKER_INFLUXDB_INIT_RETENTION: ${DOCKER_INFLUXDB_INIT_RETENTION}
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${DOCKER_INFLUXDB_INIT_ADMIN_TOKEN}
+    volumes:
+      - './config/influxdb/:/etc/influxdb2'
+      - './data/influxdb/:/var/lib/influxdb2'
+
+networks:
+  default:
+    name: ${REVERSE_PROXY_NETWORK}
+    external: true
