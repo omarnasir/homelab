@@ -1,6 +1,6 @@
 #! /bin/bash
-APPS_FOR_CNAME_RESOLUTION=( "homeassistant" "pihole" "plex" "portainer" "influxdb" "grafana" )
-STACKS_TO_COMPOSE=( "caddy" "ha_stack" "pihole" "plex" "portainer" )
+mapfile -t APPS_CNAME < APPS_CNAME.txt
+mapfile -t STACKS < STACKS.txt
 
 # Set environment variables from .env file
 export $(grep -v '^#' .env | xargs)
@@ -17,7 +17,7 @@ echo "$HOST_IP $HOME_DOMAIN"  > ./pihole/config/etc-pihole/custom.list
 # to be accessible via hostname on your local network.
 > ./pihole/config/etc-dnsmasq.d/05-pihole-custom-cname.conf
 
-for app in "${APPS_FOR_CNAME_RESOLUTION[@]}"
+for app in "${APPS_CNAME[@]}"
 do
      echo "cname=$app.$HOME_DOMAIN,$HOME_DOMAIN" >> \
      ./pihole/config/etc-dnsmasq.d/05-pihole-custom-cname.conf
@@ -25,7 +25,7 @@ done
 # ----------------- #
 
 # Run docker-compose
-for app in "${STACKS_TO_COMPOSE[@]}"
+for app in "${STACKS[@]}"
 do
      docker compose -f "$app/docker-compose.yml" up -d
 done

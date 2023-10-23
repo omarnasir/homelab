@@ -1,0 +1,6 @@
+homeassistant
+pihole
+plex
+portainer
+influxdb
+grafana

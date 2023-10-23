@@ -1,0 +1,19 @@
+services:
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:latest
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - './data:/var/lib/grafana'
+      - './config:/etc/grafana'
+    restart: unless-stopped
+    user: "$PUID:$PGID"
+    environment:
+      GF_INSTALL_PLUGINS: "grafana-clock-panel,grafana-simple-json-datasource,grafana-worldmap-panel,grafana-piechart-panel"
+      GF_SECURITY_ADMIN_PASSWORD: $GRAFANA_ADMIN_PASSWORD
+
+networks:
+  default:
+    name: ${REVERSE_PROXY_NETWORK}
+    external: true

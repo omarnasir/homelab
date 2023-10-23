@@ -1,0 +1,6 @@
+caddy
+ha_stack
+pihole
+plex
+portainer
+grafana

@@ -19,3 +19,7 @@ http://portainer.{$HOME_DOMAIN} {
 http://influxdb.{$HOME_DOMAIN} {
     reverse_proxy influxdb:8086
 }
+
+http://grafana.{$HOME_DOMAIN} {
+    reverse_proxy grafana:3000
+}
