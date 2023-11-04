@@ -5,10 +5,6 @@ mapfile -t STACKS < STACKS.txt
 # Set environment variables from .env file
 export $(grep -v '^#' .env | xargs)
 
-# Create docker network
-docker network create "$REVERSE_PROXY_NETWORK" --driver=bridge --subnet=172.19.0.0/24 \
-     --gateway=172.19.0.1
-
 # ----------------- #
 # PiHole DNS Config #
 # Write the IP of the host to the custom.list file for pihole DNS resolution
@@ -29,6 +25,9 @@ for app in "${STACKS[@]}"
 do
      docker compose -f "$app/docker-compose.yml" up -d
 done
+
+# Install Reverse proxy so all dependent networks have access to the reverse proxy
+docker compose -f caddy/docker-compose.yml up -d
 
 # unset environment vars from an .env file
 unset $(grep -v '^#' .env | awk 'BEGIN { FS = "=" } ; { print $1 }')

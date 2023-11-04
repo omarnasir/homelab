@@ -3,6 +3,11 @@ services:
     container_name: caddy
     image: caddy
     restart: always
+    networks:
+      - ha_external
+      - pihole_external
+      - portainer_external
+      - grafana_internal
     ports:
       - "80:80"
       - "443:443"
@@ -16,6 +21,12 @@ services:
       PGID: ${PGID}
 
 networks:
-  default:
-    name: ${REVERSE_PROXY_NETWORK}
+  ha_external:
     external: true
+  pihole_external:
+    external: true
+  portainer_external:
+    external: true
+  grafana_internal:
+    external: true
+  

@@ -8,19 +8,26 @@ services:
     ports:
       - '53:53/tcp'
       - '53:53/udp'
+    networks:
+      - pihole_external
     environment:
       TZ: ${TZ}
+      PUID: ${PUID}
+      PGID: ${PGID}
       WEBPASSWORD: ${PIHOLE_WEBPASSWORD} 
       FTLCONF_LOCAL_IPV4: '${HOST_IP}'
       VIRTUAL_HOST: 'pihole.${HOME_DOMAIN}'
-      PUID: ${PUID}
-      PGID: ${PGID}
+      DNS_BOGIS_PRIV: 'true'
+      DNS_BOGUS_PRIV: 'true'
+      REV_SERVER: 'true'
+      REV_SERVER_DOMAIN: '${HOME_DOMAIN}'
+      REV_SERVER_TARGET: '${HOST_GATEWAY}'
+      REV_SERVER_CIDR: '${HOST_SUBNET}'
     dns:
       - "1.1.1.1"
       - "1.0.0.1"
     restart: always
 
 networks:
-  default:
-    name: ${REVERSE_PROXY_NETWORK}
-    external: true
+  pihole_external:
+    name: pihole_external
