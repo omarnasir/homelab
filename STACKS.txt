@@ -1,6 +1,5 @@
-caddy
-ha_stack
 pihole
+grafana
+ha
 plex
 portainer
-grafana
