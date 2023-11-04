@@ -9,6 +9,9 @@ services:
     depends_on:
       - mariadb
       - influxdb
+    networks:
+      - ha_internal
+      - ha_external
     devices:
       - /dev/serial/by-id/usb-Silicon_Labs_Sonoff_Zigbee_3.0_USB_Dongle_Plus_0001-if00-port0:/dev/sonoff
     environment:
@@ -25,8 +28,7 @@ services:
       PUID: ${PUID}
       PGID: ${PGID}
     networks:
-      default:
-        ipv4_address: 172.19.0.250
+      - ha_internal
     volumes:
       - './data/mariadb/:/var/lib/mysql'
       - '${MYSQL_SOCKET}:/var/run/mysqld'
@@ -38,8 +40,8 @@ services:
       - no-new-privileges:true
     restart: unless-stopped
     networks:
-      default:
-        ipv4_address: 172.19.0.251
+      - ha_internal
+      - grafana_internal
     environment:
       DOCKER_INFLUXDB_INIT_MODE: ${DOCKER_INFLUXDB_INIT_MODE}
       DOCKER_INFLUXDB_INIT_USERNAME: ${DOCKER_INFLUXDB_INIT_USERNAME}
@@ -53,6 +55,10 @@ services:
       - './data/influxdb/:/var/lib/influxdb2'
 
 networks:
-  default:
-    name: ${REVERSE_PROXY_NETWORK}
+  ha_external:
+    name: ha_external
+  ha_internal:
+    name: ha_internal
+    internal: true
+  grafana_internal:
     external: true

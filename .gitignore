@@ -5,5 +5,5 @@
 .env
 
 # Large config directories
-ha_stack/config/
+ha/config/
 pihole/config/
