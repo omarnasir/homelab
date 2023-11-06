@@ -3,3 +3,4 @@ grafana
 ha
 plex
 portainer
+budget

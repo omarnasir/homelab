@@ -4,3 +4,5 @@ plex
 portainer
 influxdb
 grafana
+actual
+ihatemoney

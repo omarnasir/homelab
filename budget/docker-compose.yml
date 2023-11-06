@@ -1,0 +1,34 @@
+services:
+  actual:
+    container_name: actual
+    image: actualbudget/actual-server:latest
+    networks:
+      - budget_external
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+    volumes:
+      - ./data/actual:/data
+    restart: unless-stopped
+  ihatemoney:
+    image: ihatemoney/ihatemoney:latest
+    container_name: ihatemoney
+    networks:
+      - budget_external
+    environment:
+      PORT: 8000
+      PUID: ${PUID}
+      PGID: ${PGID}
+      ACTIVATE_DEMO_PROJECT: "False"
+      SESSION_COOKIE_SECURE: "False"
+      SECRET_KEY: ${IHATEMONEY_SECRET_KEY}
+      ADMIN_PASSWORD: ${IHATEMONEY_ADMIN_PASSWORD}
+      ACTIVATE_ADMIN_DASHBOARD: "True"
+    volumes:
+      - ./data/ihatemoney:/database
+      - ./config/ihatemoney:/etc/ihatemoney/
+    restart: unless-stopped
+
+networks:
+  budget_external:
+    name: budget_external

@@ -8,6 +8,7 @@ services:
       - pihole_external
       - portainer_external
       - grafana_internal
+      - budget_external
     ports:
       - "80:80"
       - "443:443"
@@ -28,5 +29,7 @@ networks:
   portainer_external:
     external: true
   grafana_internal:
+    external: true
+  budget_external:
     external: true
   

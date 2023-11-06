@@ -9,7 +9,7 @@ http://homeassistant.{$HOME_DOMAIN} {
 
 http://plex.{$HOME_DOMAIN} {
     encode gzip zstd
-    reverse_proxy 192.168.0.200:32400 
+    reverse_proxy 192.168.0.200:32400
 }
 
 http://portainer.{$HOME_DOMAIN} {
@@ -22,4 +22,13 @@ http://influxdb.{$HOME_DOMAIN} {
 
 http://grafana.{$HOME_DOMAIN} {
     reverse_proxy grafana:3000
+}
+
+http://ihatemoney.{$HOME_DOMAIN} {
+    reverse_proxy ihatemoney:8000
+}
+
+actual.{$HOME_DOMAIN} {
+    reverse_proxy actual:5006 
+    tls internal
 }
