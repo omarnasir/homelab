@@ -3,6 +3,7 @@ services:
     container_name: grafana
     image: grafana/grafana:latest
     networks:
+      - grafana_external
       - grafana_internal
     security_opt:
       - no-new-privileges:true
@@ -16,6 +17,8 @@ services:
       GF_SECURITY_ADMIN_PASSWORD: $GRAFANA_ADMIN_PASSWORD
 
 networks:
+  grafana_external:
+    name: grafana_external
   grafana_internal:
     name: grafana_internal
     internal: true

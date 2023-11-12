@@ -8,6 +8,7 @@ LIST_DIRS=(
     "./grafana/config/provisioning/dashboards" 
     "./grafana/config/provisioning/notifiers" 
     "./grafana/config/provisioning/plugins" 
+    "./grafana/config/provisioning/alerting"
     "./grafana/data" 
 )
 for dir in "${LIST_DIRS[@]}"
