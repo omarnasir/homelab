@@ -13,7 +13,9 @@
     - [2.1.1. Required .env variables](#211-required-env-variables)
     - [2.1.2. Sanity Check](#212-sanity-check)
   - [2.2. Install Docker Apps](#22-install-docker-apps)
-  - [2.3. Adding New Apps](#23-adding-new-apps)
+  - [2.3. Updating Docker Apps](#23-updating-docker-apps)
+  - [2.4. Adding New Apps](#24-adding-new-apps)
+- [Section 3. Backup Scripts](#section-3-backup-scripts)
 # Section 1: Ubuntu Server
 
 This section assumes that you have already installed Ubuntu Server 22.04 on your machine and have SSH access to it. 
@@ -91,6 +93,8 @@ Before installing docker apps, the following environment variables must be set i
 
 If an app is not mentioned below, it does not require any environment variables to be set, or it will use the default values set in the root .env file.
 
+Multiple apps can be bundled together in a single docker-compose.yml file, called a stack. This is done to reduce the number of docker-compose files, and to reduce the number of docker networks.
+
 ### 2.1.1. Required .env variables
 These are general examples, and should be modified freely. The PUID and PGID are the user and group IDs of the user that will be running the docker containers. This is to ensure that the docker containers have the correct permissions to access the mounted volumes, as well as ensure docker containers do not have root access. The PUID and PGID can be found by running the following command:
 
@@ -111,7 +115,6 @@ TZ=Europe/London
 PUID=1000
 PGID=1000
 # CADDY
-REVERSE_PROXY_NETWORK=caddy_network
 HOME_DOMAIN=homelab.home
 HOST_IP=192.168.1.2
 HOST_GATEWAY=192.168.1.1
@@ -124,7 +127,6 @@ PIHOLE_WEBPASSWORD="mypassword"
 -> ./plex/.env
 # Plex
 PLEX_CLAIM="claim_plex"
-PLEX_ALLOWED_NETWORKS="192.168.1.0/24"
 ```
 
 ### 2.1.2. Sanity Check
@@ -132,8 +134,8 @@ PLEX_ALLOWED_NETWORKS="192.168.1.0/24"
 
 ***Declared Variables***:
 
-* `APPS_TO_COMPOSE`: There is a list of apps to be installed declared in the beginning of the script. This should contain all the apps that you want to install. 
-* `APPS_FOR_CNAME_RESOLUTION`: This is a list of apps that we want to access by their domain name. This is used to create a CNAME record in the pihole container. Important: Caddy must not be included in this list. This stack uses Homarr for homepage dashboard, which must be accessible at `http://{$HOME_DOMAIN}` Since that is already handled by caddy, we do not need to create a CNAME record for it.
+* `STACKS.txt`: This file contains a list of stacks to be installed.
+* `APPS_CNAME`: This is a list of apps that we want to access by their domain name. This is used to create a CNAME record in the pihole container. Important: Caddy must not be included in this list. This stack uses Homarr for homepage dashboard, which must be accessible at `http://{$HOME_DOMAIN}` Since that is already handled by caddy, we do not need to create a CNAME record for it. This is different from STACKS, as a single STACK can contain multiple apps which need to be accessed by their domain name.
 
 ---
 ## 2.2. Install Docker Apps
@@ -149,12 +151,40 @@ If you feel that you do not need to install all the apps, you can individually i
 $ docker-compose -f ./app_name/docker-compose.yml up -d
 ```
 
+## 2.3. Updating Docker Apps
+To update all the apps, run the following command:
+
+```bash
+$ . update-docker-apps.sh
+```
+
 ---
-## 2.3. Adding New Apps
+## 2.4. Adding New Apps
 Checklist:
 - [ ] Create a new directory for the app at `./{app_name}`
 - [ ] Create a `docker-compose.yml` file in the new directory and ensure it uses the correct caddy network if it is exposed to the internet via web proxy.
-- [ ] The volumes must be split into `config` and `data` volumes. This is for backup purposes ***<span style="color: red;">!TODO: Add backup script</span>***
+- [ ] The volumes must be split into `config` and `data` volumes. This is for backup purposes.
 - [ ] The `docker-compose.yml` file should use the `.env` file in the same directory for environment variables.
-- [ ] Add app to `APPS_TO_COMPOSE` in `install-docker-apps.sh` 
-- [ ] Add app to `APPS_FOR_CNAME_RESOLUTION` in `install-docker-apps.sh` if it is exposed to the local network by CNAME resolution.
+- [ ] Add app/stack to `STACKS`. 
+- [ ] Add app to `APPS_CNAME.txt` if it is exposed to the local network by CNAME resolution.
+
+# Section 3. Backup Scripts
+
+This guide assumes that an external storage is connected to the host machine for the sole purpose of maintaining external backups. The location of the external storage can be found by running the following command. Depending on the type of the storage, substitute the grep command accordingly. The example uses an MMC storage.
+
+```bash
+$ sudo fdisk -l | grep "mmc"
+```
+
+To mount the storage, run the following command. Make sure the mount point exists.
+
+```bash
+$ sudo mkdir /mnt/backup
+$ sudo mount /dev/mmcblk0p2 /mnt/backup
+```
+
+Run the following script to backup:
+
+```bash
+$ sudo bash backup.sh
+```
