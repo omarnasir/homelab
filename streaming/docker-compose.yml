@@ -1,0 +1,40 @@
+services:
+  # plex:
+  #   image: linuxserver/plex:latest
+  #   container_name: plex
+  #   restart: unless-stopped
+  #   network_mode: host
+  #   volumes:
+  #     - './config:/config'
+  #     - './data/tv:/tv'
+  #     - './data/movies:/movies'
+  #     - '/dev/shm:/transcode'
+  #   environment:
+  #     - 'PLEX_CLAIM=${PLEX_CLAIM}'
+  #     - 'ADVERTISE_IP=http://${HOST_IP}:32400,http://plex.${HOME_DOMAIN}'
+  #     - 'ALLOWED_NETWORKS=${ALLOWED_NETWORKS}'
+  #     - PUID=${PUID}
+  #     - PGID=${PGID}
+  #     - TZ=${TZ}
+  jellyfin:
+    image: jellyfin/jellyfin
+    container_name: jellyfin
+    user: ${PUID}:${PGID}
+    networks:
+      - jellyfin_external
+    volumes:
+      - './config/jellyfin:/config'
+      - './config/jellyfin/cache:/cache'
+      - './data/tv:/media/tv'
+      - './data/movies:/media/movies' 
+    restart: 'unless-stopped'
+    # Optional - alternative address used for autodiscovery
+    environment:
+      - JELLYFIN_PublishedServerUrl=http://jellyfin.${HOME_DOMAIN}
+    # Optional - may be necessary for docker healthcheck to pass if running in host network mode
+    #extra_hosts:
+     # - "host.docker.internal:host-gateway"
+    
+networks:
+  jellyfin_external:
+    name: jellyfin_external

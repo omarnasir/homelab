@@ -1,6 +1,6 @@
 pihole
 grafana
 ha
-plex
+streaming
 portainer
 budget

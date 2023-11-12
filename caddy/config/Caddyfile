@@ -12,6 +12,10 @@ http://plex.{$HOME_DOMAIN} {
     reverse_proxy 192.168.0.200:32400
 }
 
+http://jellyfin.{$HOME_DOMAIN} {
+    reverse_proxy jellyfin:8096
+}
+
 http://portainer.{$HOME_DOMAIN} {
     reverse_proxy portainer:9000
 }

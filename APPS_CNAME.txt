@@ -1,6 +1,6 @@
 homeassistant
 pihole
-plex
+jellyfin
 portainer
 influxdb
 grafana
