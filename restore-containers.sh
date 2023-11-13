@@ -20,14 +20,13 @@ restore_budget() {
 
 restore_ha() {
     cd ha
-    mkdir -p data/influxdb
-    mkdir -p data/mariadb
+    mkdir -p data
     # Influxdb
     echo "---ha: Influxdb"
-    tar -xzf influxdb.tar.gz -C data/influxdb
+    tar -xzf influxdb.tar.gz -C data/
     # Mariadb
     echo "---ha: Mariadb"
-    tar -xzf mariadb.tar.gz -C data/mariadb
+    tar -xzf mariadb.tar.gz -C data/
     cd ..
 }
 

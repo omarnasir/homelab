@@ -29,19 +29,17 @@ backup_budget() {
 }
 
 backup_ha() {
+    cd ha/data/
     # Influxdb
-    cd ha/data/influxdb
     touch influxdb.tar.gz
-    tar --exclude=influxdb.tar.gz -czf influxdb.tar.gz .
+    tar --exclude=influxdb.tar.gz -czf influxdb.tar.gz influxdb/.
     mv influxdb.tar.gz $BACKUP_ROOT/ha/influxdb.tar.gz
-    cd ../../..
 
     # Mariadb
-    cd ha/data/mariadb
     touch mariadb.tar.gz
-    tar --exclude=mariadb.tar.gz -czf mariadb.tar.gz .
+    tar --exclude=mariadb.tar.gz -czf mariadb.tar.gz mariadb/.
     mv mariadb.tar.gz $BACKUP_ROOT/ha/mariadb.tar.gz
-    cd ../../..
+    cd ../..
 
     echo "---ha: Backed up: data"
 }

@@ -31,7 +31,6 @@ do
      if [ -f init.sh ]; then
           source init.sh
      fi
-     sudo chown -R $PUID:$PGID ./
      docker compose up -d
      cd ..
 done
