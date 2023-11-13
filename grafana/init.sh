@@ -1,15 +1,14 @@
 #! /bin/bash
 # Create directory config structure if it doesn't exist
 LIST_DIRS=( 
-    "./grafana" 
-    "./grafana/config" 
-    "./grafana/config/provisioning" 
-    "./grafana/config/provisioning/datasources" 
-    "./grafana/config/provisioning/dashboards" 
-    "./grafana/config/provisioning/notifiers" 
-    "./grafana/config/provisioning/plugins" 
-    "./grafana/config/provisioning/alerting"
-    "./grafana/data" 
+    "./config" 
+    "./config/provisioning" 
+    "./config/provisioning/datasources" 
+    "./config/provisioning/dashboards" 
+    "./config/provisioning/notifiers" 
+    "./config/provisioning/plugins" 
+    "./config/provisioning/alerting"
+    "./data"
 )
 for dir in "${LIST_DIRS[@]}"
 do
@@ -18,6 +17,6 @@ do
 done
 
 # Create config files
-[ ! -f "./grafana/config/grafana.ini" ] && touch ./grafana/config/grafana.ini \
-    && echo "Created file ./grafana/config/grafana.ini" \
-    || echo "File ./grafana/config/grafana.ini already exists";
+[ ! -f "./config/grafana.ini" ] && touch ./config/grafana.ini \
+    && echo "Created file ./config/grafana.ini" \
+    || echo "File ./config/grafana.ini already exists";

@@ -2,6 +2,9 @@
 mapfile -t APPS_CNAME < APPS_CNAME.txt
 mapfile -t STACKS < STACKS.txt
 
+# Add caddy to the end so it will have access to the networks of each stack
+STACKS+=("caddy")
+
 # Set environment variables from .env file
 export $(grep -v '^#' .env | xargs)
 
@@ -23,11 +26,15 @@ done
 # Run docker-compose
 for app in "${STACKS[@]}"
 do
-     docker compose -f "$app/docker-compose.yml" up -d
+     cd $app
+     # Run init.sh if it exists
+     if [ -f init.sh ]; then
+          source init.sh
+     fi
+     sudo chown -R $PUID:$PGID ./
+     docker compose up -d
+     cd ..
 done
-
-# Install Reverse proxy so all dependent networks have access to the reverse proxy
-docker compose -f caddy/docker-compose.yml up -d
 
 # unset environment vars from an .env file
 unset $(grep -v '^#' .env | awk 'BEGIN { FS = "=" } ; { print $1 }')
