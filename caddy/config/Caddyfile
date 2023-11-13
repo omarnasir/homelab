@@ -16,6 +16,10 @@ http://jellyfin.{$HOME_DOMAIN} {
     reverse_proxy jellyfin:8096
 }
 
+http://qbit.{$HOME_DOMAIN} {
+    reverse_proxy gluetun:8090
+}
+
 http://portainer.{$HOME_DOMAIN} {
     reverse_proxy portainer:9000
 }

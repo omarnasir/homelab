@@ -6,7 +6,7 @@ services:
     networks:
       - ha_external
       - pihole_external
-      - jellyfin_external
+      - streaming_external
       - portainer_external
       - grafana_external
       - budget_external
@@ -27,7 +27,7 @@ networks:
     external: true
   pihole_external:
     external: true
-  jellyfin_external:
+  streaming_external:
     external: true
   portainer_external:
     external: true

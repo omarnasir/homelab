@@ -1,40 +1,69 @@
 services:
-  # plex:
-  #   image: linuxserver/plex:latest
-  #   container_name: plex
-  #   restart: unless-stopped
-  #   network_mode: host
-  #   volumes:
-  #     - './config:/config'
-  #     - './data/tv:/tv'
-  #     - './data/movies:/movies'
-  #     - '/dev/shm:/transcode'
-  #   environment:
-  #     - 'PLEX_CLAIM=${PLEX_CLAIM}'
-  #     - 'ADVERTISE_IP=http://${HOST_IP}:32400,http://plex.${HOME_DOMAIN}'
-  #     - 'ALLOWED_NETWORKS=${ALLOWED_NETWORKS}'
-  #     - PUID=${PUID}
-  #     - PGID=${PGID}
-  #     - TZ=${TZ}
   jellyfin:
     image: jellyfin/jellyfin
     container_name: jellyfin
     user: ${PUID}:${PGID}
     networks:
-      - jellyfin_external
+      - streaming_external
     volumes:
       - './config/jellyfin:/config'
       - './config/jellyfin/cache:/cache'
-      - './data/tv:/media/tv'
-      - './data/movies:/media/movies' 
+      - ${TV_MEDIA_PATH}:/media/tv
+      - ${MOVIE_MEDIA_PATH}:/media/movies
     restart: 'unless-stopped'
-    # Optional - alternative address used for autodiscovery
+    security_opt:
+      - no-new-privileges:true
     environment:
       - JELLYFIN_PublishedServerUrl=http://jellyfin.${HOME_DOMAIN}
-    # Optional - may be necessary for docker healthcheck to pass if running in host network mode
-    #extra_hosts:
-     # - "host.docker.internal:host-gateway"
-    
+  gluetun:
+    image: qmcgaw/gluetun
+    container_name: gluetun
+    restart: always
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    volumes:
+      - './config/gluetun:/gluetun'
+    ports:
+      - 8090:8090 # Qbittorrent WebUI
+    environment:
+      TZ: $TZ
+      PUID: ${PUID}
+      PGID: ${PGID}
+      FIREWALL_OUTBOUND_SUBNETS: ${ALLOWED_NETWORKS}
+      # Wireguard
+      VPN_SERVICE_PROVIDER: surfshark
+      VPN_TYPE: wireguard
+      WIREGUARD_PRIVATE_KEY: $WG_VPN_PRIVATE_KEY
+      WIREGUARD_ADDRESSES: 10.14.0.2/16
+      SERVER_REGIONS: ${VPN_REGIONS}
+    networks:
+      - streaming_external
+    security_opt:
+      - no-new-privileges:true
+  qbit:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbit
+    network_mode: "service:gluetun"
+    restart: always
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - './config/qbit:/config'
+      - './data/qbit/downloads:/data/downloads'
+      - './data/qbit/torrents:/data/torrents'
+      - ${TV_MEDIA_PATH}:/data/tv
+      - ${MOVIE_MEDIA_PATH}:/data/movies
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: $TZ
+      UMASK_SET: 002
+      WEBUI_PORT: 8090
+    depends_on:
+      - gluetun
+
 networks:
-  jellyfin_external:
-    name: jellyfin_external
+  streaming_external:
+    name: streaming_external
