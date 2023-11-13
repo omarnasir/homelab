@@ -29,24 +29,19 @@ backup_budget() {
 }
 
 backup_ha() {
-    cd ha
-    export $(grep -v '^#' .env | xargs)
-
     # Influxdb
-    sudo docker exec -it influxdb influx backup --bucket homeassistant /var/lib/influxdb/backup
-    sudo docker cp influxdb:/var/lib/influxdb/backup influxdb_backup
-    sudo tar -czf $BACKUP_ROOT/ha/influxdb.tar.gz influxdb_backup
-    sudo rm -rf influxdb_backup
-    sudo docker exec -it influxdb rm -rf /var/lib/influxdb/backup
+    cd ha/data/influxdb
+    touch influxdb.tar.gz
+    tar --exclude=influxdb.tar.gz -czf influxdb.tar.gz .
+    mv influxdb.tar.gz $BACKUP_ROOT/ha/influxdb.tar.gz
+    cd ../../..
 
     # Mariadb
-    sudo docker exec -it mariadb mariadb-dump -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE > mariadb_backup.sql
-    sudo tar -czf $BACKUP_ROOT/ha/mariadb.tar.gz mariadb_backup.sql
-    sudo rm -rf mariadb_backup.sql
-
-    # unset environment vars from an .env file
-    unset $(grep -v '^#' .env | awk 'BEGIN { FS = "=" } ; { print $1 }')
-    cd ..
+    cd ha/data/mariadb
+    touch mariadb.tar.gz
+    tar --exclude=mariadb.tar.gz -czf mariadb.tar.gz .
+    mv mariadb.tar.gz $BACKUP_ROOT/ha/mariadb.tar.gz
+    cd ../../..
 
     echo "---ha: Backed up: data"
 }
