@@ -1,6 +1,0 @@
-pihole
-grafana
-ha
-streaming
-portainer
-budget
