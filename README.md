@@ -16,6 +16,8 @@
   - [2.3. Updating Docker Apps](#23-updating-docker-apps)
   - [2.4. Adding New Apps](#24-adding-new-apps)
 - [Section 3. Backup Scripts](#section-3-backup-scripts)
+  - [3.1. Backup Using External Storage](#31-backup-using-external-storage)
+  - [3.2. Backup Using same Host](#32-backup-using-same-host)
 # Section 1: Ubuntu Server
 
 This section assumes that you have already installed Ubuntu Server 22.04 on your machine and have SSH access to it. 
@@ -111,6 +113,7 @@ uid=1000(user) gid=1000(user) groups=1000(user),4(adm),24(cdrom),27(sudo),30(dip
 ```ini
 -> ./.env
 # General
+BACKUP_ROOT=/mnt/backup
 TZ=Europe/London
 PUID=1000
 PGID=1000
@@ -130,32 +133,40 @@ PLEX_CLAIM="claim_plex"
 ```
 
 ### 2.1.2. Sanity Check
-**`install-docker-apps.sh`**: This script is used to install all the apps.
-
 ***Declared Variables***:
 
-* `STACKS.txt`: This file contains a list of stacks to be installed.
-* `APPS_CNAME`: This is a list of apps that we want to access by their domain name. This is used to create a CNAME record in the pihole container. Important: Caddy must not be included in this list. This stack uses Homarr for homepage dashboard, which must be accessible at `http://{$HOME_DOMAIN}` Since that is already handled by caddy, we do not need to create a CNAME record for it. This is different from STACKS, as a single STACK can contain multiple apps which need to be accessed by their domain name.
+The configuration is defined in `config.ini`. The format is simple, with each section denoting the name of the stack. The name must correspond to the name of the directory. Each section must contain the following variables:
+* `cnames`: A list of CNAMEs that will be used to access the app. This is used to modify the dnsmasq settings in the pihole container.
+* `backup`: The subdirectories to be backed up. Each container must have a `config` and `data` subdirectory. The `config` subdirectory contains the configuration files, and the `data` subdirectory contains the data files. The backup script will create a tar archive of the subdirectories and store it in the backup directory. 
+**Warning**: Do not include the data subdirectory for containers that handle large replaceable files, such as Jellyfin.
+
+```ini
+[stack_name]
+cnames=app1,app2
+backup=config,data
+```
 
 ---
 ## 2.2. Install Docker Apps
-Once the environment variables are set, you can install the apps by running the following command:
-
+Once the environment variables are set, you can install the apps by running the following command. The argument `stack` can be either `all` or the name of the stack. The `all` argument will install all the apps. 
 ```bash
-$ . install-docker-apps.sh
+$ bash manager.sh install all
 ```
 
-If you feel that you do not need to install all the apps, you can individually install apps by using the docker-compose command. Make sure the required .env variables are set.
-
+If you feel that you do not need to install all the apps, you can individually install apps by using the docker-compose command. Make sure the required .env variables are set. The `stack` argument will install the apps in the stack.
 ```bash
-$ docker-compose -f ./app_name/docker-compose.yml up -d
+$ bash manager.sh install [stack]
 ```
 
 ## 2.3. Updating Docker Apps
 To update all the apps, run the following command:
-
 ```bash
-$ . update-docker-apps.sh
+$ bash manager.sh update all
+```
+
+or to update a specific stack:
+```bash
+$ bash manager.sh update [stack]
 ```
 
 ---
@@ -165,26 +176,43 @@ Checklist:
 - [ ] Create a `docker-compose.yml` file in the new directory and ensure it uses the correct caddy network if it is exposed to the internet via web proxy.
 - [ ] The volumes must be split into `config` and `data` volumes. This is for backup purposes.
 - [ ] The `docker-compose.yml` file should use the `.env` file in the same directory for environment variables.
-- [ ] Add app/stack to `STACKS`. 
-- [ ] Add app to `APPS_CNAME.txt` if it is exposed to the local network by CNAME resolution.
+- [ ] Add the app to `config.ini` with the correct CNAMEs and backup directories.
 
 # Section 3. Backup Scripts
 
-This guide assumes that an external storage is connected to the host machine for the sole purpose of maintaining external backups. The location of the external storage can be found by running the following command. Depending on the type of the storage, substitute the grep command accordingly. The example uses an MMC storage.
+## 3.1. Backup Using External Storage
 
+This guide assumes that an external storage is connected to the host machine for the sole purpose of maintaining external backups. The location of the external storage can be found by running the following command. Depending on the type of the storage, substitute the grep command accordingly. The example uses an MMC storage.
 ```bash
 $ sudo fdisk -l | grep "mmc"
 ```
 
 To mount the storage, run the following command. Make sure the mount point exists.
-
 ```bash
 $ sudo mkdir /mnt/backup
 $ sudo mount /dev/mmcblk0p2 /mnt/backup
 ```
 
-Run the following script to backup:
-
+Update the `BACKUP_ROOT` variable in `.env` file and set it to `/mnt/backup`. Run the following script to backup:
 ```bash
-$ sudo bash backup.sh
+$ bash manager.sh backup [stack]
+```
+
+## 3.2. Backup Using same Host
+
+If external storage is not available, the backup script can be used to backup to the same host. The backup script will create a tar archive of the backup directories and store it in the backup directory. The backup directory is set in the `.env` file. The backup script will also delete old backups to save space. The number of backups to keep is set in the `.env` file.
+
+Example `.env` variable for backup:
+```ini
+BACKUP_ROOT=/home/user/backups
+```
+
+To backup, run the following command:
+```bash
+$ bash manager.sh backup [stack]
+```
+
+To restore, run the following command:
+```bash 
+$ bash manager.sh restore [stack]
 ```

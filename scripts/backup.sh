@@ -9,12 +9,13 @@ source scripts/config-parser.sh
 # Args: $1: directory to backup
 backup_stack_subdir() {
     local arg_dir=$1
+    local arg_backup_dir=$2
     # Check if backup target dir exists
     [ ! -d $arg_dir ] && echo "WARNING: $arg_dir does not exist" && return 1
     # Backup config directory by tarring it
     touch $arg_dir.tar.gz
     tar --exclude=$arg_dir.tar.gz -czf $arg_dir.tar.gz $arg_dir
-    mv $arg_dir.tar.gz $BACKUP_DIR/$arg_dir.tar.gz
+    mv $arg_dir.tar.gz $arg_backup_dir/$arg_dir.tar.gz
     echo "INFO: ---Backed up: $arg_dir"
 }
 
@@ -71,15 +72,14 @@ fi
 parse_config_file $arg_stack
 process_stacks $arg_stack
 
-# Declare variables
-# Write backup date to file
-ROOT="$HOME/backups"
+# Retrieve BACKUP_ROOT from .env file
+BACKUP_ROOT=$(grep -E "^BACKUP_ROOT" .env | cut -d= -f2 | tr -d ' ')
 
 backup() {
-    BACKUP_ROOT="$ROOT/$(date +"%Y-%m-%d")"
-    [ ! -d $ROOT ] && mkdir -p $ROOT
+    BACKUP_DIR="$BACKUP_ROOT/$(date +"%Y-%m-%d")"
     [ ! -d $BACKUP_ROOT ] && mkdir -p $BACKUP_ROOT
-    echo $(date +"%Y-%m-%d_%H-%M-%S") > $BACKUP_ROOT/backup_date.txt
+    [ ! -d $BACKUP_DIR ] && mkdir -p $BACKUP_DIR
+    echo $(date +"%Y-%m-%d_%H-%M-%S") > $BACKUP_DIR/backup_date.txt
 
     s=0
     # Backup each stack, with stack specific backup commands
@@ -91,20 +91,20 @@ backup() {
         fi
         cd $stack
         # Create backup directory for stack
-        BACKUP_DIR=$BACKUP_ROOT/$stack
-        [ ! -d $BACKUP_DIR ] && mkdir -p $BACKUP_DIR
+        BACKUP_DIR_STACK=$BACKUP_DIR/$stack
+        [ ! -d $BACKUP_DIR_STACK ] && mkdir -p $BACKUP_DIR_STACK
         # Stop all containers for the stack
         stop_docker_containers
         # Backup .env, docker-compose.yml and init.sh
         files=(".env" "docker-compose.yml" "init.sh")
         for file in "${files[@]}"; do
             if [ -f $file ]; then
-                cp $file $BACKUP_DIR/$file
+                cp $file $BACKUP_DIR_STACK/$file
             fi
         done
-        BACKUP_DIRS=($(get_backup_dirs_by_stack $stack))
-        for dir in "${BACKUP_DIRS[@]}"; do
-            backup_stack_subdir $dir
+        DIRS_TO_BACKUP=($(get_backup_dirs_by_stack $stack))
+        for dir in "${DIRS_TO_BACKUP[@]}"; do
+            backup_stack_subdir $dir $BACKUP_DIR_STACK
         done
         # Start all containers for the stack
         start_docker_containers
@@ -113,11 +113,11 @@ backup() {
     done
 
     # Copy contents of scripts directory
-    cp -r scripts $BACKUP_ROOT/
+    cp -r scripts $BACKUP_DIR/
     # Copy manager.sh, .env file and Makefile
-    cp manager.sh $BACKUP_ROOT/
-    cp .env $BACKUP_ROOT/
-    cp Makefile $BACKUP_ROOT/
+    cp manager.sh $BACKUP_DIR/
+    cp .env $BACKUP_DIR/
+    cp Makefile $BACKUP_DIR/
 
     (( $s > 0 )) && echo "INFO: Backed up $s stacks: ${STACKS[@]}" || \
         echo "WARNING: No stacks backed up" 
@@ -134,8 +134,8 @@ restore (){
         fi
 
         cd $stack
-        BACKUP_DIRS=($(get_backup_dirs_by_stack $stack))
-        for dir in "${BACKUP_DIRS[@]}"; do
+        DIRS_TO_BACKUP=($(get_backup_dirs_by_stack $stack))
+        for dir in "${DIRS_TO_BACKUP[@]}"; do
             restore_stack_subdir $dir
         done
         cd ..
