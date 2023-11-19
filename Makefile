@@ -10,3 +10,6 @@ apt_upgrade:
 apt_clean:
 	sudo apt clean -y;
 	sudo apt autoremove -y;
+
+stop_all_containers:
+	docker ps -q | xargs docker stop
