@@ -20,13 +20,12 @@ services:
   mariadb:
     image: mariadb
     container_name: mariadb
+    user: ${PUID}:${PGID}
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      PUID: ${PUID}
-      PGID: ${PGID}
     networks:
       - ha_internal
     volumes:
