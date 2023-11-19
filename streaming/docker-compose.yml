@@ -26,7 +26,7 @@ services:
     volumes:
       - './config/gluetun:/gluetun'
     ports:
-      - 8090:8090 # Qbittorrent WebUI
+      - 8080:8080 # Qbittorrent WebUI
     environment:
       TZ: $TZ
       PUID: ${PUID}
@@ -60,7 +60,6 @@ services:
       PGID: ${PGID}
       TZ: $TZ
       UMASK_SET: 002
-      WEBUI_PORT: 8090
     depends_on:
       - gluetun
 
