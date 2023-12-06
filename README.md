@@ -18,6 +18,7 @@
 - [Section 3. Backup Scripts](#section-3-backup-scripts)
   - [3.1. Backup Using External Storage](#31-backup-using-external-storage)
   - [3.2. Backup Using same Host](#32-backup-using-same-host)
+    - [3.2.1. Using cron to automate backups](#321-using-cron-to-automate-backups)
 # Section 1: Ubuntu Server
 
 This section assumes that you have already installed Ubuntu Server 22.04 on your machine and have SSH access to it. 
@@ -215,4 +216,15 @@ $ bash manager.sh backup [stack]
 To restore, run the following command:
 ```bash 
 $ bash manager.sh restore [stack]
+```
+
+### 3.2.1. Using cron to automate backups
+
+To automate backups, the backup script can be run using cron. To edit the cron jobs, run the following command:
+```bash
+$ crontab -e
+```
+Add the following line to the end of the file to run the backup script every day at 4am:
+```bash
+0 4 * * * /bin/bash manager.sh backup all
 ```
