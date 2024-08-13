@@ -1,8 +1,30 @@
 services:
+  plex:
+    image: linuxserver/plex:latest
+    container_name: plex
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - ./config:/config
+      - /dev/shm:/transcode
+      - ${TV_MEDIA_PATH}:/tv
+      - ${MOVIE_MEDIA_PATH}:/movies
+    environment:
+      - 'PLEX_CLAIM=${PLEX_CLAIM}'
+      - 'ADVERTISE_IP=http://${HOST_IP}:32400,http://plex.${HOME_DOMAIN}'
+      - ALLOWED_NETWORKS=${ALLOWED_NETWORKS}
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - VERSION=docker
+    devices:
+     - /dev/dri:/dev/dri
   jellyfin:
     image: jellyfin/jellyfin
     container_name: jellyfin
     user: ${PUID}:${PGID}
+    group_add:
+      - "993"
     networks:
       - streaming_external
     volumes:
@@ -10,6 +32,8 @@ services:
       - './config/jellyfin/cache:/cache'
       - ${TV_MEDIA_PATH}:/media/tv
       - ${MOVIE_MEDIA_PATH}:/media/movies
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128
     restart: 'unless-stopped'
     security_opt:
       - no-new-privileges:true
@@ -28,7 +52,7 @@ services:
     ports:
       - 8080:8080 # Qbittorrent WebUI
     environment:
-      TZ: $TZ
+      TZ: ${TZ}
       PUID: ${PUID}
       PGID: ${PGID}
       FIREWALL_OUTBOUND_SUBNETS: ${ALLOWED_NETWORKS}
