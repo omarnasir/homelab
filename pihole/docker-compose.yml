@@ -21,7 +21,6 @@ services:
       DNS_BOGIS_PRIV: 'true'
       DNS_BOGUS_PRIV: 'true'
       REV_SERVER: 'true'
-      REV_SERVER_DOMAIN: '${HOME_DOMAIN}'
       REV_SERVER_TARGET: '${HOST_GATEWAY}'
       REV_SERVER_CIDR: '${HOST_SUBNET}'
     dns:

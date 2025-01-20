@@ -1,49 +1,50 @@
 (cloudflare) {
-		tls {
-				dns cloudflare {$CF_API_TOKEN}
-		}
+	tls {
+		dns cloudflare {$CF_API_TOKEN}
+	}
 }
 
 http://pihole.{$HOME_DOMAIN} {
-		reverse_proxy pihole:80
-		encode zstd gzip
+	reverse_proxy pihole:80
+	encode zstd gzip
 }
 
-http://homeassistant.{$HOME_DOMAIN} {
-		reverse_proxy homeassistant:8123
+homeassistant.{$DOMAIN} {
+	reverse_proxy homeassistant:8123
+	import cloudflare
 }
 
 http://plex.{$HOME_DOMAIN} {
-		encode gzip zstd
-		reverse_proxy 10.0.10.10:32400
+	encode gzip zstd
+	reverse_proxy 10.0.10.10:32400
 }
 
 http://jellyfin.{$HOME_DOMAIN} {
-		reverse_proxy jellyfin:8096
+	reverse_proxy jellyfin:8096
 }
 
 http://qbit.{$HOME_DOMAIN} {
-		reverse_proxy gluetun:8080
+	reverse_proxy gluetun:8080
 }
 
 influxdb.{$DOMAIN} {
-		reverse_proxy influxdb:8086
-		import cloudflare
+	reverse_proxy influxdb:8086
+	import cloudflare
 }
 
 grafana.{$DOMAIN} {
-		reverse_proxy grafana:3000
-		import cloudflare
+	reverse_proxy grafana:3000
+	import cloudflare
 }
 
 ihatemoney.{$DOMAIN} {
-		reverse_proxy ihatemoney:8000
-		import cloudflare
+	reverse_proxy ihatemoney:8000
+	import cloudflare
 }
 
 actual.{$DOMAIN} {
-		reverse_proxy actual:5006 
-		import cloudflare
+	reverse_proxy actual:5006
+	import cloudflare
 }
 
 thevault.{$DOMAIN} {

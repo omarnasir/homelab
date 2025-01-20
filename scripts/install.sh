@@ -31,8 +31,11 @@ install() {
 	# ----------------- #
 	# PiHole DNS Config #
 	# Write the IP of the host to the custom.list file for pihole DNS resolution
-	echo "$HOST_IP $HOME_DOMAIN"  > pihole/config/etc-pihole/custom.list
-	echo "$HOST_IP $DOMAIN"  > pihole/config/etc-pihole/custom.list
+	# First truncate the file
+	> pihole/config/etc-pihole/custom.list
+	# Add the host IP and the domain to the custom.list file
+	echo "$HOST_IP $HOME_DOMAIN" >> pihole/config/etc-pihole/custom.list
+	echo "$HOST_IP $DOMAIN" >> pihole/config/etc-pihole/custom.list
 	# Write CNAME for pihole to resolve to the host. Define your apps here that you wish
 	# to be accessible via hostname on your local network.
 	path_to_cname="pihole/config/etc-dnsmasq.d/05-pihole-custom-cname.conf"

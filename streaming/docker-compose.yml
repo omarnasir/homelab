@@ -52,7 +52,7 @@ services:
     ports:
       - 8080:8080 # Qbittorrent WebUI
     environment:
-      TZ: ${TZ}
+      TZ: $TZ
       PUID: ${PUID}
       PGID: ${PGID}
       FIREWALL_OUTBOUND_SUBNETS: ${ALLOWED_NETWORKS}
@@ -77,8 +77,8 @@ services:
       - no-new-privileges:true
     volumes:
       - './config/qbit:/config'
-      - './data/qbit/downloads:/data/downloads'
-      - './data/qbit/torrents:/data/torrents'
+      - ${QBIT_DOWNLOADS_PATH}:/data/downloads
+      - ${QBIT_TORRENTS_PATH}:/data/torrents
       - ${TV_MEDIA_PATH}:/data/tv
       - ${MOVIE_MEDIA_PATH}:/data/movies
     environment:
