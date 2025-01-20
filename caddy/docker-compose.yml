@@ -1,13 +1,16 @@
 services:
   caddy:
     container_name: caddy
-    image: caddy
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - VERSION=${CADDY_VERSION}
     restart: always
     networks:
       - ha_external
       - pihole_external
       - streaming_external
-      - portainer_external
       - grafana_external
       - budget_external
     ports:
@@ -21,6 +24,8 @@ services:
       HOME_DOMAIN: '${HOME_DOMAIN}'
       PUID: ${PUID}
       PGID: ${PGID}
+      CF_API_TOKEN: ${CF_API_TOKEN}
+      DOMAIN: '${DOMAIN}'
 
 networks:
   ha_external:
@@ -29,10 +34,7 @@ networks:
     external: true
   streaming_external:
     external: true
-  portainer_external:
-    external: true
   grafana_external:
     external: true
   budget_external:
     external: true
-  

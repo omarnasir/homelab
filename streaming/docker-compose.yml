@@ -61,7 +61,9 @@ services:
       VPN_TYPE: wireguard
       WIREGUARD_PRIVATE_KEY: $WG_VPN_PRIVATE_KEY
       WIREGUARD_ADDRESSES: 10.14.0.2/16
-      SERVER_REGIONS: ${VPN_REGIONS}
+      # SERVER_REGIONS: ${VPN_REGIONS}
+      SERVER_COUNTRIES: ${VPN_COUNTRIES}
+      UPDATER_PERIOD: 24h
     networks:
       - streaming_external
     security_opt:

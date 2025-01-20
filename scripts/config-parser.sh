@@ -9,6 +9,7 @@ STACKS=()
 LINE_NUMS=()
 CNAMES=()
 BACKUP=()
+TYPES=()
 
 parse_config_file() {
     local arg_stack=$1
@@ -50,10 +51,13 @@ process_stacks() {
         # the line at the = sign, and get the second field
         local names=$(sed -n "$start_line,$end_line p" $CONF_FILE | grep "cnames" | cut -d= -f2 | tr ',' '\n')
         local backup=($(sed -n "$start_line,$end_line p" $CONF_FILE | grep "backup" | cut -d= -f2 | tr ' ' '\n'))
+        local type=$(sed -n "$start_line,$end_line p" $CONF_FILE | grep "type" | cut -d= -f2 | tr ',' '\n')
         CNAMES+=("${names}")
         BACKUP+=("${backup}")
+        TYPES+=("${type}")
     done
     CNAMES=($(echo ${CNAMES[@]} | tr ' ' '\n'))
+    TYPES=($(echo ${TYPES[@]} | tr ' ' '\n'))
 }
 
 get_backup_dirs_by_stack() {
@@ -65,13 +69,3 @@ get_backup_dirs_by_stack() {
     backup_dirs=$(echo $backup_dirs | tr ',' '\n')
     echo $backup_dirs
 }
-
-# parse_config_file $1
-# process_stacks $1
-# for stack in "${STACKS[@]}"; do
-#     echo "INFO: Backing up: $stack"
-#     backup_dirs=($(get_backup_dirs_by_stack $stack))
-#     for dir in "${backup_dirs[@]}"; do
-#         echo "INFO: ---Backed up: $dir"
-#     done
-# done

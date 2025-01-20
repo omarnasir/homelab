@@ -32,17 +32,23 @@ install() {
 	# PiHole DNS Config #
 	# Write the IP of the host to the custom.list file for pihole DNS resolution
 	echo "$HOST_IP $HOME_DOMAIN"  > pihole/config/etc-pihole/custom.list
+	echo "$HOST_IP $DOMAIN"  > pihole/config/etc-pihole/custom.list
 	# Write CNAME for pihole to resolve to the host. Define your apps here that you wish
 	# to be accessible via hostname on your local network.
 	path_to_cname="pihole/config/etc-dnsmasq.d/05-pihole-custom-cname.conf"
 	[ -z path_to_cname ] && touch $path_to_cname
 	# Add the cnames to the pihole custom-cname file
 	flag_cname_changed=0
-	for cname in "${CNAMES[@]}"
-	do
+	for ((index = 0; index < ${#CNAMES[@]}; index++));
+	do 
+		cname=${CNAMES[$index]}
+		# The cname depends on the type defined in the config file.
+		# If the type is "internal", the cname will use $HOME_DOMAIN, else use $DOMAIN for "external"
+		type=${TYPES[$index]}
+		domain=$([ "$type" == "internal" ] && echo "$HOME_DOMAIN" || echo "$DOMAIN")
 		# Search if the cname is not in the pihole custom-cname file
-		if ! grep -q "$cname.$HOME_DOMAIN" "$path_to_cname"; then
-			echo "cname=$cname.$HOME_DOMAIN,$HOME_DOMAIN" >> "$path_to_cname"
+		if ! grep -q "$cname.$domain" "$path_to_cname"; then
+			echo "cname=$cname.$domain,$domain" >> "$path_to_cname"
 			flag_cname_changed=1
 		fi
 	done
